@@ -12,5 +12,8 @@ function currencyinfo(currency) {
                 return setData(resp[currency])
             })
         console.log(data);
+        return data
     }, [currency])
-}
+};
+
+export default currencyinfo
