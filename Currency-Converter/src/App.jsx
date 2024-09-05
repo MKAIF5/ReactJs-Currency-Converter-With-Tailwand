@@ -4,31 +4,33 @@ import useCurrencyInfo from "./hooks/useCurrencyInfo";
 
 function App() {
   const [amount, setAmount] = useState(0);
-  const [from, setFrom] = useState("usd");
-  const [to, setTo] = useState("pkr");
+  const [from, setFrom] = useState("USD");
+  const [to, setTo] = useState("PKR");
+  const { data: currencyRates, loading, error } = useCurrencyInfo(from);
   const [convertedAmount, setConvertedAmount] = useState(0);
-  const currencyInfo = useCurrencyInfo(from);
 
   useEffect(() => {
-    if (currencyInfo[to] !== undefined) {
-      setConvertedAmount(amount * currencyInfo[to]);
+    if (amount > 0 && currencyRates[to] !== undefined) {
+      setConvertedAmount(amount * currencyRates[to]);
     }
-  }, [amount, currencyInfo, to]);
+  }, [amount, from, to, currencyRates]);
 
-  const options = Object.keys(currencyInfo);
+  const options = Object.keys(currencyRates);
 
   const swap = () => {
     setFrom(to);
     setTo(from);
-    setAmount(convertedAmount);
-    setConvertedAmount(amount * (currencyInfo[to] || 1));
+    setAmount(convertedAmount / (currencyRates[to] || 1));
   };
 
   const convert = () => {
-    if (currencyInfo[to] !== undefined) {
-      setConvertedAmount(amount * currencyInfo[to]);
+    if (currencyRates[to] !== undefined) {
+      setConvertedAmount(amount * currencyRates[to]);
     }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div
